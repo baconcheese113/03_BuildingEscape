@@ -21,6 +21,10 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+private:
+	int32 x = 0;
+	// How far ahead of the player can we reach in cm
+	int32 Reach = 100;
 		
 	
 };
