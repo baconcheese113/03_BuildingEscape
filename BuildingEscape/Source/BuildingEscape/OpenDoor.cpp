@@ -20,6 +20,10 @@ UOpenDoor::UOpenDoor()
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
+	// Look for attached Physics Handle
+	if (!PressurePlate) {
+		UE_LOG(LogTemp, Error, TEXT("No Pressure Plate found on %s."), *GetOwner()->GetName());
+	}
 			
 }
 
@@ -30,19 +34,16 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
 	// Poll the Trigger Volume
-	if (GetTotalMassOfActorsOnPlate() > 50.f) {
-		OpenDoor(true);
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
-	}
-
-	//Check if it's time to close door
-	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay) {
-		OpenDoor(false);
+	if (GetTotalMassOfActorsOnPlate() > TriggerMass) {
+		OnOpen.Broadcast();
+	}else {
+		OnClose.Broadcast();
 	}
 }
 
 float UOpenDoor::GetTotalMassOfActorsOnPlate() {
 	float TotalMass = 0.f;
+	if (!PressurePlate) return 0.f;
 	
 	// Find all the overlapping actors
 	TArray<AActor*> OverlappingActors;
@@ -54,13 +55,4 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate() {
 		
 	}
 	return TotalMass;
-}
-
-// Move the door open if true, closed if false
-void UOpenDoor::OpenDoor(bool Open) {
-	//My implementation
-	AActor* Owner = GetOwner();
-
-	FRotator NewRotation = FRotator(0.f, (Open ? OpenAngle : 50.f), 0.f);
-	Owner->SetActorRotation(NewRotation);
 }

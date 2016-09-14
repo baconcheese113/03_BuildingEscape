@@ -30,7 +30,7 @@ void UGrabber::Grab() {
 	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
 	AActor* ActorHit = HitResult.GetActor();
 	// If we hit something then attach a physics handle
-	if (ActorHit) {
+	if (ActorHit && PhysicsHandle) {
 		PhysicsHandle->GrabComponent(
 			ComponentToGrab,
 			NAME_None, //no bones needed
@@ -98,7 +98,7 @@ FVector UGrabber::GetReachLine(bool Start)
 void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-
+	if (!PhysicsHandle) return;
 	// if the physics handle is attached
 	if (PhysicsHandle->GrabbedComponent) {
 		PhysicsHandle->SetTargetLocation(GetReachLine(false));
